@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -32,7 +34,9 @@ public class ProductService {
     }
 
     public ProductDTO findById(Integer id) {
-        return ProductMapper.INSTANCE.entityToDTO(repository.findById(id).get());
+        ProductDTO dto = ProductMapper.INSTANCE.entityToDTO(repository.findById(id).get());
+        enrichProductDetails(Arrays.asList(dto));
+        return dto;
     }
 
     public Page<ProductDTO> findByCondition(ProductDTO productDto, Pageable pageable) {
@@ -49,6 +53,17 @@ public class ProductService {
 
     public List<ProductDTO> findAllProducts() {
         List<Product> products = repository.findAll();
-        return ProductMapper.INSTANCE.entityListToDTOList(products);
+        List<ProductDTO> productsDto = ProductMapper.INSTANCE.entityListToDTOList(products);
+        enrichProductDetails(productsDto);
+        return productsDto;
+    }
+
+    private void enrichProductDetails(List<ProductDTO> products) {
+        for (ProductDTO product : products) {
+            product.setCode(product.getName().substring(0,2).toUpperCase()+123);
+            product.setBatch(product.getCode()+ LocalDate.now());
+            product.setDealerPrice(product.getPrice()*1.30);
+            product.setMrp(product.getPrice()*3);
+        }
     }
 }

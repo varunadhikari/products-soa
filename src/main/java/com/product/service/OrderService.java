@@ -20,6 +20,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -67,9 +68,12 @@ public class OrderService {
     }
 
     public OrderDTO update(OrderDTO orderDto, Integer id) {
-        OrderDTO data = findById(id);
+        //OrderDTO data = findById(id);
         Order entity = OrderMapper.INSTANCE.orderDTOToOrder(orderDto);
-        return OrderMapper.INSTANCE.orderToOrderDTO(repository.save(entity));
+        entity.getOrderDetailList().forEach( od ->{
+            od.setOrder(entity);
+        });
+        return OrderMapper.INSTANCE.orderToOrderDTO(repository.saveAndFlush(entity));
     }
 
     public List<OrderDTO> findAllOrders(Integer days) {
@@ -78,9 +82,7 @@ public class OrderService {
         CriteriaQuery<Order> cq = cb.createQuery(Order.class);
         Root<Order> or = cq.from(Order.class);
         if(days!=0){
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DAY_OF_MONTH, -days);
-            Predicate datePredicate = cb.greaterThanOrEqualTo(or.get("orderDate"), calendar.getTime());
+            Predicate datePredicate = cb.greaterThanOrEqualTo(or.get("orderDate"), LocalDate.now().minusDays(days));
             cq.where(datePredicate);
         }
         TypedQuery<Order> query = em.createQuery(cq);
@@ -94,9 +96,7 @@ public class OrderService {
         CriteriaQuery<Order> cq = cb.createQuery(Order.class);
         Root<Order> or = cq.from(Order.class);
         if(days!=0){
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DAY_OF_MONTH, -days);
-            Predicate datePredicate = cb.greaterThanOrEqualTo(or.get("orderDate"), calendar.getTime());
+            Predicate datePredicate = cb.greaterThanOrEqualTo(or.get("orderDate"), LocalDate.now().minusDays(days));
             cq.where(datePredicate);
         }
         Predicate idPredicate = cb.equal(or.get("userId"),userId);

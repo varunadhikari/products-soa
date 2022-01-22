@@ -1,9 +1,17 @@
 package com.product.entity;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "PRODUCT")
+@Getter
+@Setter
+@Data
 public class Product {
 
 	@Id
@@ -21,58 +29,28 @@ public class Product {
 	@Column(name = "DESCRIPTION")
 	private String description;
 
+	@Column(name = "CODE")
+	private String code;
+
+	@Column(name = "BATCH")
+	private String batch;
+
+	@Column(name = "MFG_DATE")
+	private LocalDate mfgDate;
+
+	@Column(name = "EXPIRY_DATE")
+	private LocalDate expiryDate;
+
 	@Column(name = "PRICE")
 	private Double price;
 
+	@Column(name = "DEALER_PRICE")
+	private Double dealerPrice;
+
+	@Column(name = "MRP")
+	private Double mrp;
+
 	@Column(name = "QUANTITY")
 	private Integer quantity;
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getCompany() {
-		return company;
-	}
-
-	public void setCompany(String company) {
-		this.company = company;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public Double getPrice() {
-		return price;
-	}
-
-	public void setPrice(Double price) {
-		this.price = price;
-	}
-
-	public Integer getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
-	}
 
 }
