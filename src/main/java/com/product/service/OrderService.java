@@ -13,7 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,6 +35,9 @@ public class OrderService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private EntityManager em;
 
     public OrderDTO save(OrderDTO orderDto) {
         Order entity = OrderMapper.INSTANCE.orderDTOToOrder(orderDto);
@@ -62,13 +72,36 @@ public class OrderService {
         return OrderMapper.INSTANCE.orderToOrderDTO(repository.save(entity));
     }
 
-    public List<OrderDTO> findAllOrders() {
-        List<Order> orders = repository.findAll();
-        return OrderMapper.INSTANCE.orderListToOrderDTOList(orders);
+    public List<OrderDTO> findAllOrders(Integer days) {
+        //List<Order> orders = repository.findAll();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Order> cq = cb.createQuery(Order.class);
+        Root<Order> or = cq.from(Order.class);
+        if(days!=0){
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_MONTH, -days);
+            Predicate datePredicate = cb.greaterThanOrEqualTo(or.get("orderDate"), calendar.getTime());
+            cq.where(datePredicate);
+        }
+        TypedQuery<Order> query = em.createQuery(cq);
+
+        return OrderMapper.INSTANCE.orderListToOrderDTOList(query.getResultList());
     }
 
-    public List<OrderDTO> findAllOrdersByUser(String userId) {
-        List<Order> orders = repository.findByUserId(userId);
-        return OrderMapper.INSTANCE.orderListToOrderDTOList(orders);
+    public List<OrderDTO> findAllOrdersByUser(Integer days, String userId) {
+        //List<Order> orders = repository.findByUserId(userId);
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Order> cq = cb.createQuery(Order.class);
+        Root<Order> or = cq.from(Order.class);
+        if(days!=0){
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_MONTH, -days);
+            Predicate datePredicate = cb.greaterThanOrEqualTo(or.get("orderDate"), calendar.getTime());
+            cq.where(datePredicate);
+        }
+        Predicate idPredicate = cb.equal(or.get("userId"),userId);
+        cq.where(idPredicate);
+        TypedQuery<Order> query = em.createQuery(cq);
+        return OrderMapper.INSTANCE.orderListToOrderDTOList(query.getResultList());
     }
 }

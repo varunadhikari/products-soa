@@ -34,14 +34,14 @@ public class OrderController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<OrderDTO>> findAllOrders() {
-        List<OrderDTO> orders = orderService.findAllOrders();
+    public ResponseEntity<List<OrderDTO>> findAllOrders(@RequestParam(value = "days") Integer days) {
+        List<OrderDTO> orders = orderService.findAllOrders(days);
         return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<OrderDTO>> findAllOrdersByUser(@PathVariable("id") String id) {
-        List<OrderDTO> orders = orderService.findAllOrdersByUser(id);
+    public ResponseEntity<List<OrderDTO>> findAllOrdersByUser(@RequestParam(value = "days") Integer days, @PathVariable("id") String id) {
+        List<OrderDTO> orders = orderService.findAllOrdersByUser(days, id);
         return ResponseEntity.ok(orders);
     }
 
