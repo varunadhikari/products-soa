@@ -1,5 +1,6 @@
 package com.product.entity;
 
+import com.product.repository.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,7 +29,8 @@ public class Order {
 	private LocalDate orderDate;
 	
 	@Column(name = "STATUS")
-	private String status;
+	@Enumerated(EnumType.STRING)
+	private OrderStatus status;
 	
 	@Column(name = "TOTAL_AMOUNT")
 	private Double totalAmount;

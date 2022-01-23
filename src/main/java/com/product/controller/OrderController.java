@@ -1,6 +1,7 @@
 package com.product.controller;
 
 import com.product.model.OrderDTO;
+import com.product.model.OrderStatusCount;
 import com.product.service.OrderService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -55,5 +56,11 @@ public class OrderController {
     public ResponseEntity<Void> update(@RequestBody @Validated OrderDTO orderDto, @PathVariable("id") Integer id) {
         orderService.update(orderDto, id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/status/{user}")
+    public ResponseEntity<OrderStatusCount> findAllOrdersStatusCount(@PathVariable(value = "user") String user) {
+        OrderStatusCount orders = orderService.findAllOrdersStatusCount(user);
+        return ResponseEntity.ok(orders);
     }
 }

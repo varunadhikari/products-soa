@@ -6,7 +6,9 @@ import com.product.entity.Product;
 import com.product.mapper.OrderDetailMapper;
 import com.product.mapper.OrderMapper;
 import com.product.model.OrderDTO;
+import com.product.model.OrderStatusCount;
 import com.product.repository.OrderRepository;
+import com.product.repository.OrderStatus;
 import com.product.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,5 +105,29 @@ public class OrderService {
         cq.where(idPredicate);
         TypedQuery<Order> query = em.createQuery(cq);
         return OrderMapper.INSTANCE.orderListToOrderDTOList(query.getResultList());
+    }
+
+    public OrderStatusCount findAllOrdersStatusCount(String user) {
+        OrderStatusCount count = new OrderStatusCount();
+        List<Order> orders = new ArrayList<>();
+        if(user.equalsIgnoreCase("admin")) {
+            orders = repository.findAll();
+        }else{
+            orders = repository.findByUserId(user);
+        }
+        count.setTotal(orders.size());
+        for(Order o : orders){
+            if(o.getStatus()== OrderStatus.Approved){
+                count.setApproved(count.getApproved()+1);
+            }
+            if(o.getStatus()== OrderStatus.Rejected){
+                count.setRejected(count.getRejected()+1);
+            }
+            if(o.getStatus()== OrderStatus.Ordered || o.getStatus()== OrderStatus.Hold){
+                count.setPending(count.getPending()+1);
+            }
+        }
+
+        return count;
     }
 }
