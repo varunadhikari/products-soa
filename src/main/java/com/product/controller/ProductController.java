@@ -17,7 +17,6 @@ import java.util.List;
 
 @RequestMapping({"/external/product","/api/product"})
 @RestController
-@Slf4j
 @Api("product")
 public class ProductController {
 
